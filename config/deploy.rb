@@ -44,6 +44,10 @@ namespace :deploy do
     run "cd #{current_path} && bundle exec rake assets:precompile"
   end
 
+  task :symlink_uploaded_files do
+    run "ln -s -f #{shared_path}/uploads #{current_path}/public/uploads"
+  end
+
   task :restart do
     thins = capture_svstat "/service/thin*"
     matches = thins.split("\n").inject([]) do |list, line|
@@ -91,6 +95,7 @@ end
 after 'deploy:symlink' do
   deploy.symlink_config_files
   deploy.symlink_cookie_secret
+  deploy.symlink_uploaded_files
   deploy.bundle_static_assets
   deploy.copy_resque_assets
 end
